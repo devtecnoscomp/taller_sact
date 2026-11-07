@@ -1,15 +1,14 @@
 {
     "name": "SACT",
     "version": "17.0.1.34.0",
-    "summary": "Gestión de taller: recepción, diagnóstico, reparación y entrega",
+    "summary": "Workshop management: reception, diagnosis, repair and delivery",
     "description": """
-Taller SACT - reemplazo del módulo Repair estándar.
-Replica el flujo: ESPERA -> EN REPARACION (nota) -> LISTO (pre-alta) -> ENTREGADO (alta) / DE BAJA.
-Incluye equipo, cliente, técnico, accesorios, fotos (chatter/adjuntos),
-actualizaciones/timeline, garantías, precios y token de seguimiento portal.
+SACT Workshop - replacement for the standard Repair module.
+Replicates the flow: WAITING -> IN REPAIR (note) -> READY (pre-delivery) -> DELIVERED (delivery) / WRITTEN OFF.
+Includes equipment, customer, technician, accessories, photos (chatter/attachments),
+updates/timeline, warranties, prices and portal tracking token.
     """,
     "author": "SACT",
-    "website": "https://github.com/devtecnoscomp/taller_sact",
     "category": "Services/Repair",
     "depends": ["base", "mail", "sale", "stock"],
     "data": [
