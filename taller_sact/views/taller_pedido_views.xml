@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_taller_pedido_list" model="ir.ui.view">
+        <field name="name">taller.pedido.list</field>
+        <field name="model">taller.pedido</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="telefono"/>
+                <field name="tipo_pieza"/>
+                <field name="marca_equipo"/>
+                <field name="modelo_equipo"/>
+                <field name="precio_pieza" sum="Total precio"/>
+                <field name="abono" sum="Total abonos"/>
+                <field name="saldo" sum="Total saldo"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'pendiente'"
+                       decoration-success="state == 'entregado'"/>
+                <field name="fecha"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_taller_pedido_form" model="ir.ui.view">
+        <field name="name">taller.pedido.form</field>
+        <field name="model">taller.pedido</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_entregar" string="Marcar entregado" type="object" class="oe_highlight" invisible="state != 'pendiente'"/>
+                    <button name="action_pendiente" string="Volver a pendiente" type="object" invisible="state != 'entregado'"/>
+                    <button name="print_pedido" string="Imprimir pedido" type="object" invisible="not id"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Pedido">
+                            <field name="name"/>
+                            <field name="fecha"/>
+                            <field name="state" invisible="1"/>
+                        </group>
+                        <group string="Pago">
+                            <field name="precio_pieza"/>
+                            <field name="abono"/>
+                            <field name="saldo"/>
+                        </group>
+                    </group>
+                    <group string="Cliente">
+                        <field name="partner_id"/>
+                        <field name="telefono"/>
+                        <field name="identidad"/>
+                    </group>
+                    <group string="Pieza / equipo">
+                        <field name="tipo_pieza"/>
+                        <field name="marca_equipo"/>
+                        <field name="modelo_equipo"/>
+                        <field name="serie"/>
+                        <field name="numero_parte"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_taller_pedido_search" model="ir.ui.view">
+        <field name="name">taller.pedido.search</field>
+        <field name="model">taller.pedido</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="tipo_pieza"/>
+                <field name="marca_equipo"/>
+                <field name="numero_parte"/>
+                <filter name="pendiente" string="Pendientes" domain="[('state','=','pendiente')]"/>
+                <filter name="entregado" string="Entregados" domain="[('state','=','entregado')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="state" string="Estado" context="{'group_by':'state'}"/>
+                    <filter name="mes" string="Mes" context="{'group_by':'fecha:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_taller_pedido" model="ir.actions.act_window">
+        <field name="name">Pedidos</field>
+        <field name="res_model">taller.pedido</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

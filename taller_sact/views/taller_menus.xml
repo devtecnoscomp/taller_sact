@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_taller_nueva_orden" model="ir.actions.act_window">
+        <field name="name">Nueva orden</field>
+        <field name="res_model">taller.orden</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_taller_orden_form_simple"/>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_taller_root" name="SACT"/>
+    <menuitem id="menu_taller_orden" name="Órdenes" parent="menu_taller_root" action="action_taller_orden" sequence="10"/>
+    <menuitem id="menu_taller_prealta" name="Pre-altas" parent="menu_taller_root" sequence="20"/>
+    <menuitem id="menu_taller_prealta_lista" name="Bandeja" parent="menu_taller_prealta" action="action_taller_prealta_list" sequence="1"/>
+    <menuitem id="menu_taller_prealta_nueva" name="Generar pre-alta" parent="menu_taller_prealta" action="action_taller_prealta_wizard" sequence="2"/>
+    <menuitem id="menu_taller_alta" name="Generar alta" parent="menu_taller_root" action="action_taller_alta_wizard" sequence="21"/>
+    <menuitem id="menu_taller_baja" name="Generar baja" parent="menu_taller_root" action="action_taller_baja_wizard" sequence="22"/>
+    <menuitem id="menu_taller_nota" name="Nueva nota" parent="menu_taller_root" action="action_taller_nota_wizard" sequence="30"/>
+    <menuitem id="menu_taller_pedido" name="Pedidos" parent="menu_taller_root" action="action_taller_pedido" sequence="35"/>
+    <menuitem id="menu_taller_campo" name="Trabajos de campo" parent="menu_taller_root" action="action_taller_campo" sequence="36"/>
+    <menuitem id="menu_taller_insumo" name="Insumos" parent="menu_taller_root" action="action_taller_insumo" sequence="37"/>
+    <menuitem id="menu_taller_licencia" name="Licencias" parent="menu_taller_root" action="action_taller_licencia" sequence="37"/>
+    <menuitem id="menu_taller_param_root" name="Parámetros" parent="menu_taller_root" sequence="40"/>
+    <menuitem id="menu_taller_tecnico" name="Técnicos" parent="menu_taller_param_root" action="action_taller_tecnico" sequence="41"/>
+    <menuitem id="menu_taller_tipo_equipo" name="Tipos de equipo" parent="menu_taller_param_root" action="action_taller_tipo_equipo" sequence="42"/>
+    <menuitem id="menu_taller_marca" name="Marcas" parent="menu_taller_param_root" action="action_taller_marca" sequence="43"/>
+    <menuitem id="menu_taller_tipo_trabajo" name="Tipos de trabajo" parent="menu_taller_param_root" action="action_taller_tipo_trabajo" sequence="44"/>
+    <menuitem id="menu_taller_tipo_licencia" name="Tipos de licencia" parent="menu_taller_param_root" action="action_taller_tipo_licencia" sequence="45"/>
+    <menuitem id="menu_taller_reportes_root" name="Reportes" parent="menu_taller_root" sequence="50"/>
+    <menuitem id="menu_taller_reporte_altas" name="Reporte de altas" parent="menu_taller_reportes_root" action="action_taller_reporte_altas_wizard" sequence="51"/>
+    <menuitem id="menu_taller_reporte_insumos" name="Reporte de insumos" parent="menu_taller_reportes_root" action="action_taller_reporte_insumos_wizard" sequence="54"/>
+    <menuitem id="menu_taller_reporte_campo" name="Reporte de trabajos de campo" parent="menu_taller_reportes_root" action="action_taller_reporte_campo_wizard" sequence="55"/>
+    <menuitem id="menu_taller_estadisticas" name="Estadísticas por técnico" parent="menu_taller_reportes_root" action="action_taller_estadisticas_url" sequence="52"/>
+    <menuitem id="menu_taller_financiero_pedidos" name="Financiero de pedidos" parent="menu_taller_reportes_root" action="action_taller_financiero_pedidos_url" sequence="53"/>
+</odoo>

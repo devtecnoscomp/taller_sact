@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Asistente: periodo del reporte -->
+    <record id="view_taller_reporte_altas_wizard_form" model="ir.ui.view">
+        <field name="name">taller.reporte.altas.wizard.form</field>
+        <field name="model">taller.reporte.altas.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="periodo_tipo"/>
+                    <field name="fecha_desde" invisible="periodo_tipo != 'rango'"/>
+                    <field name="fecha_hasta" invisible="periodo_tipo != 'rango'"/>
+                    <field name="mes" invisible="periodo_tipo != 'mes'"/>
+                    <field name="ano" invisible="periodo_tipo not in ('mes','ano')"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Ver reporte" type="object" class="oe_highlight"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_taller_reporte_altas_wizard" model="ir.actions.act_window">
+        <field name="name">Reporte de altas</field>
+        <field name="res_model">taller.reporte.altas.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Estadísticas por técnico: dashboard -->
+    <record id="action_taller_estadisticas_url" model="ir.actions.act_url">
+        <field name="name">Estadísticas por técnico</field>
+        <field name="url">/taller/estadisticas</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Reporte financiero de pedidos -->
+    <record id="action_taller_financiero_pedidos_url" model="ir.actions.act_url">
+        <field name="name">Financiero de pedidos</field>
+        <field name="url">/taller/pedidos/financiero</field>
+        <field name="target">new</field>
+    </record>
+
+    <template id="estadisticas">
+        <t t-call="web.html_container">
+            <div class="st-panel">
+                <style>
+                    .st-panel { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem 2rem; }
+                    .st-panel h3 { margin: 0 0 1rem; }
+                    .st-filter { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: 1.5rem; }
+                    .st-filter label { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: #64748b; margin-bottom: .15rem; }
+                    .st-filter .row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+                    .st-filter input, .st-filter select { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: .9rem; min-width: 170px; }
+                    .st-filter button { padding: 8px 20px; background: #00144a; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: .9rem; }
+                    .st-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+                    .st-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: .9rem 1.1rem; box-shadow: 0 1px 3px rgba(15,23,42,.06); }
+                    .st-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: #64748b; }
+                    .st-value { font-size: 1.5rem; font-weight: 700; color: #00144a; margin-top: .2rem; }
+                    .st-value.money { color: #16a34a; }
+                    .st-sec { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #64748b; margin: 0 0 .85rem; }
+                    .st-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+                    .st-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: .95rem 1.1rem; box-shadow: 0 1px 3px rgba(15,23,42,.06); }
+                    .st-card h4 { margin: 0 0 .7rem; padding-bottom: .7rem; border-bottom: 1px solid #f1f5f9; font-size: .95rem; color: #00144a; }
+                    .st-metric { display: flex; justify-content: space-between; font-size: .88rem; margin-top: .5rem; }
+                    .st-metric span:first-child { color: #64748b; }
+                    .st-metric b.money { color: #16a34a; }
+                    .st-pct { display: flex; align-items: center; gap: .6rem; margin-top: .4rem; font-size: .82rem; }
+                    .st-bar { flex: 1; height: 6px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+                    .st-fill { height: 100%; background: #3498db; border-radius: 999px; }
+                    .st-fill.money { background: #22c55e; }
+                    .st-chart { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.1rem; }
+                    .st-empty { text-align: center; color: #94a3b8; padding: 2.5rem 1rem; }
+                    .st-head { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; border-bottom: 4px solid #00144a; box-shadow: 0 1px 3px rgba(15,23,42,.06); }
+                    .st-head h3 { margin: 0; color: #00144a; font-size: 1.25rem; }
+                    .st-head p { margin: .25rem 0 0; color: #64748b; font-size: .85rem; }
+                </style>
+                <div class="st-head">
+                    <h3>Estadísticas de Servicio</h3>
+                    <p>Tecno's Comp · Barrio El Centro, Tocoa, Colón · Soporte Técnico: 3359-8370</p>
+                </div>
+                <form class="st-filter" method="GET" action="/taller/estadisticas">
+                    <div class="row">
+                        <div><label>Técnico</label>
+                            <select name="tecnico">
+                                <option value="">Todos los técnicos</option>
+                                <t t-foreach="tecnicos" t-as="tc">
+                                    <option t-att-value="tc.id" t-att-selected="'selected' if sel_tecnico == tc.id else None"><t t-esc="tc.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+                        <div><label>Fecha inicio</label><input type="date" name="desde" t-att-value="desde or ''"/></div>
+                        <div><label>Fecha fin</label><input type="date" name="hasta" t-att-value="hasta or ''"/></div>
+                        <div><button type="submit">Filtrar</button></div>
+                    </div>
+                </form>
+                <div class="st-summary">
+                    <div class="st-box"><div class="st-label">Órdenes totales</div><div class="st-value"><t t-esc="tot_ordenes"/></div></div>
+                    <div class="st-box"><div class="st-label">Altas totales</div><div class="st-value"><t t-esc="tot_altas"/></div></div>
+                    <div class="st-box"><div class="st-label">Ingresos totales</div><div class="st-value money">L. <t t-esc="'%0.2f' % tot_ingresos"/></div></div>
+                </div>
+                <t t-if="not stats"><div class="st-box st-empty">No hay datos para los filtros seleccionados</div></t>
+                <t t-if="stats">
+                    <p class="st-sec">Desempeño por técnico</p>
+                    <div class="st-grid">
+                        <t t-foreach="stats" t-as="s">
+                            <div class="st-card">
+                                <h4><t t-esc="s['name']"/></h4>
+                                <div class="st-metric"><span>Órdenes recibidas</span><b><t t-esc="s['ordenes']"/></b></div>
+                                <div class="st-metric"><span>Altas completadas</span><b><t t-esc="s['altas']"/></b></div>
+                                <div class="st-metric"><span>Ingresos según altas</span><b class="money">L. <t t-esc="'%0.2f' % s['ingresos']"/></b></div>
+                                <div class="st-pct"><span><t t-esc="'%0.1f' % s['pct_altas']"/>% altas</span><div class="st-bar"><div class="st-fill" t-attf-style="width: #{min(100, s['pct_altas'])}%"/></div></div>
+                                <div class="st-pct"><span><t t-esc="'%0.1f' % s['pct_ing']"/>% ing.</span><div class="st-bar"><div class="st-fill money" t-attf-style="width: #{min(100, s['pct_ing'])}%"/></div></div>
+                            </div>
+                        </t>
+                    </div>
+                    <p class="st-sec">Comparativa general</p>
+                    <div class="st-chart"><canvas id="stChart" height="110"></canvas></div>
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <script>
+                        new Chart(document.getElementById('stChart'), {type: 'bar',
+                            data: {labels: [<t t-foreach="stats" t-as="s">'<t t-esc="s['name']"/>',</t>],
+                                datasets: [
+                                    {label: 'Órdenes recibidas', data: [<t t-foreach="stats" t-as="s"><t t-esc="s['ordenes']"/>,</t>], backgroundColor: 'rgba(34,197,94,.65)'},
+                                    {label: 'Altas completadas', data: [<t t-foreach="stats" t-as="s"><t t-esc="s['altas']"/>,</t>], backgroundColor: 'rgba(52,152,219,.65)'}]},
+                            options: {responsive: true, scales: {y: {beginAtZero: true, ticks: {precision: 0}}}}});
+                    </script>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- Reporte de altas imprimible -->
+    <template id="reporte_altas">
+        <t t-call="web.html_container">
+            <div class="taller-print">
+                <style>
+                    @page { size: Letter; margin: 10mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    .taller-print { font-family: 'Segoe UI', Arial, sans-serif; color: #313131; max-width: 215.9mm; margin: 0 auto; padding: 10px; background: #fff; font-size: 12px; }
+                    .taller-print .tp-head { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+                    .taller-print .tp-company { font-size: 22px; font-weight: bold; color: #2980b9; }
+                    .taller-print .tp-title { font-size: 18px; margin: 10px 0; color: #3498db; }
+                    .taller-print .tp-period { font-size: 14px; margin-bottom: 10px; color: #34495e; }
+                    .taller-print table.tp-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+                    .taller-print table.tp-table th { background: #3498db; color: #fff; padding: 8px; text-align: left; }
+                    .taller-print table.tp-table td { padding: 6px; border-bottom: 1px solid #ddd; overflow-wrap: break-word; word-break: break-word; }
+                    .taller-print .tp-total { margin-top: 16px; text-align: right; font-size: 14px; font-weight: bold; }
+                    .taller-print .tp-total span { background: #f39c12; color: #fff; padding: 3px 8px; border-radius: 4px; }
+                    .taller-print .tp-printbtn { text-align: right; margin-bottom: 10px; }
+                    .taller-print .tp-printbtn button { font-size: 14px; padding: 8px 22px; background: #00144a; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                    @media print {
+                        .taller-print .tp-printbtn { display: none !important; }
+                        .taller-print { max-width: none; width: 100%; padding: 0; }
+                        .taller-print * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .taller-print table.tp-table th { background: #3498db !important; color: #fff !important; }
+                        .taller-print .tp-total span { background: #f39c12 !important; color: #fff !important; }
+                    }
+                </style>
+                <div class="tp-printbtn"><button onclick="window.print()">Imprimir</button></div>
+                <div class="tp-head">
+                    <div class="tp-company">Tecno's Comp</div>
+                    <div>Tecnología y Servicios Computacionales</div>
+                    <div class="tp-title">REPORTE DE ALTAS DE SERVICIO</div>
+                    <div class="tp-period">Período: <t t-esc="etiqueta"/></div>
+                </div>
+                <table class="tp-table">
+                    <thead>
+                        <tr><th>Orden</th><th>Fecha salida</th><th>Cliente</th><th>Equipo</th><th>Técnico</th><th>Precio</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="docs" t-as="o">
+                            <td><span t-field="o.name"/></td>
+                            <td><span t-field="o.fecha_salida"/></td>
+                            <td><span t-field="o.partner_id.name"/></td>
+                            <td><span t-field="o.tipo_equipo_id"/> <span t-field="o.marca_id"/></td>
+                            <td><span t-field="o.tecnico_alta_id.name"/></td>
+                            <td>L. <span t-field="o.precio"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tp-total">
+                    <p>Total de Altas: <t t-esc="len(docs)"/></p>
+                    <p>Monto Total: <span>L. <t t-esc="'%0.2f' % total"/></span></p>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- REPORTE FINANCIERO DE PEDIDOS -->
+    <template id="reporte_financiero_pedidos">
+        <t t-call="web.html_container">
+            <div class="taller-print">
+                <style>
+                    @page { size: Letter; margin: 10mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    .taller-print { font-family: 'Segoe UI', Arial, sans-serif; color: #2c3e50; max-width: 215.9mm; margin: 0 auto; padding: 10px; background: #fff; font-size: 12px; }
+                    .taller-print .tp-head { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+                    .taller-print .tp-company { font-size: 22px; font-weight: bold; color: #2980b9; }
+                    .taller-print .tp-title { font-size: 18px; margin: 10px 0 6px; color: #3498db; font-weight: bold; }
+                    .taller-print .tp-period { font-size: 13px; color: #34495e; }
+                    .taller-print .tp-sec { background: #2980b9; color: #fff; padding: 7px 12px; margin: 20px 0 12px; font-weight: bold; font-size: 13px; border-radius: 4px; }
+                    .taller-print table.tp-grid { width: 100%; border-collapse: collapse; }
+                    .taller-print table.tp-grid td { width: 50%; padding: 12px 10px; text-align: center; border: 2px solid #3498db; background: #ecf3fb; }
+                    .taller-print .tp-stat-label { font-size: 10px; color: #5b7b9a; text-transform: uppercase; font-weight: 600; }
+                    .taller-print .tp-stat-value { font-size: 16px; font-weight: bold; color: #2c3e50; margin-top: 5px; }
+                    .taller-print table.tp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                    .taller-print table.tp-table th { background: #3498db; color: #fff; padding: 8px; text-align: left; }
+                    .taller-print table.tp-table td { padding: 7px; border-bottom: 1px solid #e2e8f0; }
+                    .taller-print .tp-num { text-align: right; }
+                    .taller-print .tp-foot { text-align: right; font-size: 10px; color: #7f8c8d; margin-top: 14px; border-top: 1px solid #3498db; padding-top: 8px; }
+                    .taller-print .tp-printbtn { text-align: right; margin-bottom: 10px; }
+                    .taller-print .tp-printbtn button { font-size: 14px; padding: 8px 22px; background: #28a745; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                    @media print {
+                        .taller-print .tp-printbtn { display: none !important; }
+                        .taller-print { max-width: none; width: 100%; padding: 0; }
+                        .taller-print * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    }
+                </style>
+                <div class="tp-printbtn"><button onclick="window.print()">Imprimir</button></div>
+                <div class="tp-head">
+                    <div class="tp-company">Tecno's Comp</div>
+                    <div>Tecnología y Servicios Computacionales</div>
+                    <div class="tp-title">REPORTE FINANCIERO DE PEDIDOS</div>
+                    <div class="tp-period">Período: Histórico · Reporte emitido el <t t-esc="hoy"/></div>
+                </div>
+                <div class="tp-sec">Resumen General</div>
+                <table class="tp-grid tp-nobreak">
+                    <tr>
+                        <td><div class="tp-stat-label">Total de Pedidos</div><div class="tp-stat-value"><t t-esc="total_pedidos"/></div></td>
+                        <td><div class="tp-stat-label">Ingresos Brutos</div><div class="tp-stat-value">L. <t t-esc="'%0.2f' % ingresos_brutos"/></div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="tp-stat-label">Total Abonos</div><div class="tp-stat-value">L. <t t-esc="'%0.2f' % total_abonos"/></div></td>
+                        <td><div class="tp-stat-label">Saldo Pendiente</div><div class="tp-stat-value">L. <t t-esc="'%0.2f' % saldo_pendiente"/></div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="tp-stat-label">Pedidos Entregados</div><div class="tp-stat-value"><t t-esc="pedidos_entregados"/></div></td>
+                        <td><div class="tp-stat-label">Pedidos Pendientes</div><div class="tp-stat-value"><t t-esc="pedidos_pendientes"/></div></td>
+                    </tr>
+                </table>
+                <div class="tp-sec">Histórico Mensual</div>
+                <table class="tp-table">
+                    <thead><tr><th>Mes</th><th class="tp-num">Total Pedidos</th><th class="tp-num">Ingresos</th></tr></thead>
+                    <tbody>
+                        <tr t-foreach="por_mes" t-as="m">
+                            <td><t t-esc="m['mes']"/></td>
+                            <td class="tp-num"><t t-esc="m['total']"/></td>
+                            <td class="tp-num">L. <t t-esc="'%0.2f' % m['ingresos']"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tp-foot">Reporte generado el <t t-esc="hoy"/></div>
+            </div>
+        </t>
+    </template>
+</odoo>

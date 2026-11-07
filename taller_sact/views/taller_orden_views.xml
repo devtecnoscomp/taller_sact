@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_taller_orden_tree" model="ir.ui.view">
+        <field name="name">taller.orden.tree</field>
+        <field name="model">taller.orden</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="tipo_equipo_id"/>
+                <field name="marca_id"/>
+                <field name="modelo"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'espera'"
+                       decoration-info="state == 'en_reparacion'"
+                       decoration-primary="state == 'listo'"
+                       decoration-success="state == 'entregado'"
+                       decoration-danger="state == 'baja'"/>
+                <field name="tecnico_id"/>
+                <field name="fecha_ingreso"/>
+                <field name="precio"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_taller_orden_form" model="ir.ui.view">
+        <field name="name">taller.orden.form</field>
+        <field name="model">taller.orden</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_wizard_prealta" string="Generar pre-alta" type="object" class="oe_highlight" invisible="not id or state == 'entregado' or state == 'baja'"/>
+                    <button name="action_wizard_alta" string="Generar alta" type="object" class="oe_highlight" invisible="not id or state == 'entregado' or state == 'baja'"/>
+                    <button name="action_wizard_baja" string="Generar baja" type="object" confirm="¿Dar de baja esta orden?" invisible="not id or state == 'entregado' or state == 'baja'"/>
+                    <button name="action_wizard_nota" string="Nueva nota" type="object" invisible="not id or state == 'entregado' or state == 'baja'"/>
+                    <button name="print_orden" string="Imprimir orden" type="object" invisible="not id"/>
+                    <button name="action_whatsapp" string="WhatsApp" type="object" invisible="not id"/>
+                    <button name="print_prealta" string="Imprimir pre-alta" type="object" invisible="not codigo_prealta"/>
+                    <button name="print_alta" string="Imprimir alta" type="object" invisible="state != 'entregado'"/>
+                    <button name="action_generar_certificado" string="Generar certificado" type="object" invisible="not id"/>
+                    <field name="state" widget="statusbar" statusbar_visible="espera,en_reparacion,listo,entregado,baja"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Orden">
+                            <field name="name"/>
+                            <field name="codigo_prealta" invisible="not id"/>
+                            <field name="partner_id"/>
+                            <field name="tecnico_id"/>
+                            <field name="tecnico_prealta_id" readonly="1"/>
+                            <field name="tecnico_alta_id" readonly="1"/>
+                            <field name="fecha_ingreso"/>
+                            <field name="fecha_salida" invisible="not id"/>
+                            <field name="token_seguimiento" invisible="not id"/>
+                            <field name="link_seguimiento" widget="url" invisible="not id"/>
+                        </group>
+                        <group string="Equipo">
+                            <field name="tipo_equipo_id"/>
+                            <field name="marca_id" domain="[('tipo_equipo_id','=',tipo_equipo_id)]"/>
+                            <field name="modelo"/>
+                            <field name="numero_serie"/>
+                            <field name="cargador"/>
+                            <field name="tipo_trabajo_id"/>
+                        </group>
+                    </group>
+                    <group string="Falla y accesorios">
+                        <field name="descripcion_problema"/>
+                        <field name="defecto_previo"/>
+                        <field name="accesorios"/>
+                        <field name="descripcion_trabajo"/>
+                    </group>
+                    <group string="Diagnóstico (pre-alta)" invisible="not id">
+                        <field name="solucion_previa"/>
+                        <field name="precio_estimado"/>
+                    </group>
+                    <group string="Entrega (alta / baja)" invisible="not id">
+                        <field name="solucion"/>
+                        <field name="calidad"/>
+                        <field name="garantia"/>
+                        <field name="precio"/>
+                        <field name="productos_usados"/>
+                        <field name="reclama"/>
+                        <field name="motivo_baja"/>
+                        <field name="observaciones_baja"/>
+                        <field name="sale_order_id"/>
+                    </group>
+                    <notebook invisible="not id">
+                        <page string="Certificados">
+                            <field name="certificado_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="tipo_licencia_id"/>
+                                    <field name="fecha_emision"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Timeline">
+                            <field name="actualizacion_ids">
+                                <list editable="bottom">
+                                    <field name="fecha"/>
+                                    <field name="estado"/>
+                                    <field name="nota"/>
+                                    <field name="user_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Chatter">
+                            <field name="message_follower_ids"/>
+                            <field name="message_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_taller_orden_form_simple" model="ir.ui.view">
+        <field name="name">taller.orden.form.simple (recepción)</field>
+        <field name="model">taller.orden</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group string="Cliente">
+                        <field name="partner_id"/>
+                        <field name="tecnico_id"/>
+                    </group>
+                    <group string="Equipo">
+                        <field name="tipo_equipo_id" required="1"/>
+                        <field name="marca_id" domain="[('tipo_equipo_id','=',tipo_equipo_id)]"/>
+                        <field name="modelo"/>
+                        <field name="numero_serie"/>
+                        <field name="cargador"/>
+                        <field name="tipo_trabajo_id"/>
+                    </group>
+                    <group string="Falla">
+                        <field name="descripcion_problema"/>
+                        <field name="defecto_previo"/>
+                        <field name="accesorios"/>
+                        <field name="descripcion_trabajo"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_taller_orden_search" model="ir.ui.view">
+        <field name="name">taller.orden.search</field>
+        <field name="model">taller.orden</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="numero_serie"/>
+                <field name="tipo_equipo_id"/>
+                <filter name="espera" string="En espera" domain="[('state','=','espera')]"/>
+                <filter name="listo" string="Listos" domain="[('state','=','listo')]"/>
+                <filter name="reparacion" string="En reparación" domain="[('state','=','en_reparacion')]"/>
+                <filter name="entregado" string="Entregados" domain="[('state','=','entregado')]"/>
+                <filter name="baja" string="De baja" domain="[('state','=','baja')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="state" string="Estado" context="{'group_by':'state'}"/>
+                    <filter name="tecnico" string="Técnico" context="{'group_by':'tecnico_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_taller_orden" model="ir.actions.act_window">
+        <field name="name">Órdenes de taller</field>
+        <field name="res_model">taller.orden</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_taller_prealta_list" model="ir.ui.view">
+        <field name="name">taller.prealtas.list</field>
+        <field name="model">taller.orden</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-warning="dias_listo &gt;= 7">
+                <field name="codigo_prealta"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="telefono_cliente"/>
+                <field name="tipo_equipo_id"/>
+                <field name="marca_id"/>
+                <field name="precio_estimado" sum="Total estimado"/>
+                <field name="fecha_listo"/>
+                <field name="dias_listo"/>
+                <button name="action_wizard_prealta" string="Pre-alta" type="object" icon="fa-wrench"/>
+                <button name="action_recordatorio" string="Recordar" type="object" icon="fa-whatsapp"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_taller_prealta_list" model="ir.actions.act_window">
+        <field name="name">Pre-altas</field>
+        <field name="res_model">taller.orden</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_taller_prealta_list"/>
+        <field name="domain">[('state','=','listo')]</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent">
+            Órdenes que ya tienen pre-alta generada.
+          </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="tecnico_carlos" model="taller.tecnico">
+        <field name="name">Carlos</field>
+    </record>
+    <record id="tecnico_walter" model="taller.tecnico">
+        <field name="name">Walter</field>
+    </record>
+    <record id="tecnico_felipe" model="taller.tecnico">
+        <field name="name">Felipe</field>
+    </record>
+    <record id="tecnico_mauricio" model="taller.tecnico">
+        <field name="name">Mauricio</field>
+    </record>
+</odoo>

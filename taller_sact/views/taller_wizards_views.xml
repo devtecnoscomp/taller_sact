@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Generar pre-alta: pantalla separada -->
+    <record id="view_taller_prealta_wizard_form" model="ir.ui.view">
+        <field name="name">taller.prealta.wizard.form</field>
+        <field name="model">taller.prealta.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="orden_id" domain="[('state','not in',('entregado','baja'))]"/>
+                    <field name="codigo_prealta"/>
+                    <field name="tecnico_id"/>
+                    <field name="solucion_previa"/>
+                    <field name="precio_estimado"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Generar pre-alta (pasa a LISTO)" type="object" class="oe_highlight"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_taller_prealta_wizard" model="ir.actions.act_window">
+        <field name="name">Generar pre-alta</field>
+        <field name="res_model">taller.prealta.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Generar alta: pantalla separada -->
+    <record id="view_taller_alta_wizard_form" model="ir.ui.view">
+        <field name="name">taller.alta.wizard.form</field>
+        <field name="model">taller.alta.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>Escanée el código de barras de la pre-alta para cargar la orden, o selecciónela manualmente.</p>
+                <group>
+                    <field name="codigo_scan" placeholder="Pistola: escanee aquí + Enter"/>
+                    <field name="orden_id" domain="[('state','not in',('entregado','baja'))]"/>
+                    <field name="tecnico_id"/>
+                    <field name="reclama"/>
+                    <field name="solucion"/>
+                    <field name="calidad"/>
+                    <field name="garantia"/>
+                    <field name="productos_usados"/>
+                    <field name="precio"/>
+                    <field name="fecha_salida"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Guardar alta (pasa a ENTREGADO)" type="object" class="oe_highlight"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_taller_alta_wizard" model="ir.actions.act_window">
+        <field name="name">Generar alta</field>
+        <field name="res_model">taller.alta.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Generar baja: pantalla separada -->
+    <record id="view_taller_baja_wizard_form" model="ir.ui.view">
+        <field name="name">taller.baja.wizard.form</field>
+        <field name="model">taller.baja.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="orden_id" domain="[('state','not in',('entregado','baja'))]"/>
+                    <field name="motivo_baja"/>
+                    <field name="observaciones_baja"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Dar de baja" type="object" class="oe_highlight"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_taller_baja_wizard" model="ir.actions.act_window">
+        <field name="name">Generar baja</field>
+        <field name="res_model">taller.baja.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Nueva nota + link cliente -->
+    <record id="view_taller_nota_wizard_form" model="ir.ui.view">
+        <field name="name">taller.nota.wizard.form</field>
+        <field name="model">taller.nota.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>Elija la orden, escriba el estado y la nota. Al guardar se genera el token de seguimiento y el link para enviar al cliente.</p>
+                <group>
+                    <field name="orden_id"/>
+                    <field name="estado"/>
+                    <field name="nota"/>
+                    <field name="imagen" widget="image"/>
+                    <field name="link_result" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Guardar nota y generar link" type="object" class="oe_highlight"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_taller_nota_wizard" model="ir.actions.act_window">
+        <field name="name">Nueva nota</field>
+        <field name="res_model">taller.nota.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>
