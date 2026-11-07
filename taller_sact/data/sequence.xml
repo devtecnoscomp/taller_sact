@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seq_taller_orden" model="ir.sequence">
+        <field name="name">Código Taller SACT</field>
+        <field name="code">taller.orden</field>
+        <field name="prefix">OT-</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+    <record id="seq_taller_pedido" model="ir.sequence">
+        <field name="name">Código Pedido SACT</field>
+        <field name="code">taller.pedido</field>
+        <field name="prefix">PED-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+    <record id="seq_taller_licencia" model="ir.sequence">
+        <field name="name">Código Certificado Licencia</field>
+        <field name="code">taller.licencia.certificado</field>
+        <field name="prefix">LI-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

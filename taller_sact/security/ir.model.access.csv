@@ -1,0 +1,19 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_taller_orden_user,taller.orden user,model_taller_orden,,1,1,1,1
+access_taller_actualizacion_user,taller.actualizacion user,model_taller_actualizacion,,1,1,1,1
+access_taller_prealta_wizard,taller.prealta.wizard,model_taller_prealta_wizard,,1,1,1,1
+access_taller_alta_wizard,taller.alta.wizard,model_taller_alta_wizard,,1,1,1,1
+access_taller_baja_wizard,taller.baja.wizard,model_taller_baja_wizard,,1,1,1,1
+access_taller_nota_wizard,taller.nota.wizard,model_taller_nota_wizard,,1,1,1,1
+access_taller_reporte_altas_wizard,taller.reporte.altas.wizard,model_taller_reporte_altas_wizard,,1,1,1,1
+access_taller_tecnico_user,taller.tecnico user,model_taller_tecnico,,1,1,1,1
+access_taller_tipo_equipo,taller.tipo.equipo,model_taller_tipo_equipo,,1,1,1,1
+access_taller_marca,taller.marca,model_taller_marca,,1,1,1,1
+access_taller_tipo_trabajo,taller.tipo.trabajo,model_taller_tipo_trabajo,,1,1,1,1
+access_taller_tipo_licencia,taller.tipo.licencia,model_taller_tipo_licencia,,1,1,1,1
+access_taller_pedido_user,taller.pedido user,model_taller_pedido,,1,1,1,1
+access_taller_insumo_user,taller.insumo user,model_taller_insumo,,1,1,1,1
+access_taller_reporte_insumos_wizard,taller.reporte.insumos.wizard,model_taller_reporte_insumos_wizard,,1,1,1,1
+access_taller_licencia_certificado,taller.licencia.certificado,model_taller_licencia_certificado,,1,1,1,1
+access_taller_campo,taller.campo,model_taller_campo,,1,1,1,1
+access_taller_reporte_campo_wizard,taller.reporte.campo.wizard,model_taller_reporte_campo_wizard,,1,1,1,1

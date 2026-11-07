@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- LISTA de insumos registrados -->
+    <record id="view_taller_insumo_list" model="ir.ui.view">
+        <field name="name">taller.insumo.list</field>
+        <field name="model">taller.insumo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="categoria"/>
+                <field name="cantidad"/>
+                <field name="stock_minimo"/>
+                <field name="bajo_minimo" widget="badge" decoration-danger="bajo_minimo == True" decoration-success="bajo_minimo == False"/>
+                <field name="costo" sum="Total costo"/>
+                <field name="valor_total" sum="Total gasto"/>
+                <field name="proveedor_id"/>
+                <field name="fecha"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_taller_insumo_form" model="ir.ui.view">
+        <field name="name">taller.insumo.form</field>
+        <field name="model">taller.insumo</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group string="Insumo">
+                            <field name="name"/>
+                            <field name="categoria"/>
+                            <field name="proveedor_id"/>
+                            <field name="fecha"/>
+                        </group>
+                        <group string="Existencias">
+                            <field name="cantidad"/>
+                            <field name="stock_minimo"/>
+                            <field name="bajo_minimo"/>
+                        </group>
+                    </group>
+                    <group string="Costo interno">
+                        <field name="costo"/>
+                        <field name="valor_total"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_taller_insumo_search" model="ir.ui.view">
+        <field name="name">taller.insumo.search</field>
+        <field name="model">taller.insumo</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="proveedor_id"/>
+                <field name="categoria"/>
+                <filter name="bajo_stock" string="Bajo stock" domain="[('bajo_minimo','=',True)]"/>
+                <filter name="hoy" string="Hoy" domain="[('fecha','=',context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="categoria" string="Categoría" context="{'group_by':'categoria'}"/>
+                    <filter name="proveedor" string="Proveedor" context="{'group_by':'proveedor_id'}"/>
+                    <filter name="mes" string="Mes" context="{'group_by':'fecha:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_taller_insumo" model="ir.actions.act_window">
+        <field name="name">Insumos</field>
+        <field name="res_model">taller.insumo</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Wizard reporte filtrado -->
+    <record id="view_taller_reporte_insumos_wizard_form" model="ir.ui.view">
+        <field name="name">taller.reporte.insumos.wizard.form</field>
+        <field name="model">taller.reporte.insumos.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="fecha_desde"/>
+                    <field name="fecha_hasta"/>
+                    <field name="categoria"/>
+                    <field name="proveedor_id"/>
+                    <field name="solo_bajo_stock"/>
+                </group>
+                <footer>
+                    <button name="action_ver_lista" string="Ver lista filtrada" type="object" class="oe_highlight"/>
+                    <button name="action_imprimir" string="Imprimir" type="object" class="btn-secondary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_taller_reporte_insumos_wizard" model="ir.actions.act_window">
+        <field name="name">Reporte de insumos</field>
+        <field name="res_model">taller.reporte.insumos.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_taller_reporte_insumos_url" model="ir.actions.act_url">
+        <field name="name">Reporte imprimible</field>
+        <field name="url">/taller/reporte/insumos</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Reporte imprimible filtrado -->
+    <template id="reporte_insumos">
+        <t t-call="web.html_container">
+            <div class="taller-print">
+                <style>
+                    .taller-print { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; max-width: 215.9mm; margin: 0 auto; padding: 10px; background: #fff; font-size: 12px; }
+                    .taller-print .tp-head { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+                    .taller-print .tp-company { font-size: 22px; font-weight: bold; color: #2980b9; }
+                    .taller-print .tp-title { font-size: 18px; margin: 10px 0; color: #3498db; }
+                    .taller-print table.tp-table { width: 100%; border-collapse: collapse; }
+                    .taller-print table.tp-table th { background: #3498db; color: #fff; padding: 8px; text-align: left; }
+                    .taller-print table.tp-table td { padding: 6px; border-bottom: 1px solid #ddd; }
+                    .taller-print .tp-total { margin-top: 12px; text-align: right; font-weight: bold; }
+                    .taller-print .tp-printbtn { text-align: right; margin-bottom: 10px; }
+                    .taller-print .tp-printbtn button { padding: 8px 22px; background: #00144a; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                    @media print { .taller-print .tp-printbtn { display: none !important; } }
+                </style>
+                <div class="tp-printbtn"><button onclick="window.print()">Imprimir</button></div>
+                <div class="tp-head">
+                    <div class="tp-company">Tecno's Comp</div>
+                    <div class="tp-title">REPORTE DE INSUMOS</div>
+                    <div>Filtros: <t t-esc="etiqueta"/></div>
+                </div>
+                <table class="tp-table">
+                    <thead>
+                        <tr><th>Insumo</th><th>Categoría</th><th>Cantidad</th><th>Costo</th><th>Valorizado</th><th>Proveedor</th><th>Fecha</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="docs" t-as="o">
+                            <td><span t-field="o.name"/></td>
+                            <td><span t-field="o.categoria"/></td>
+                            <td><span t-field="o.cantidad"/></td>
+                            <td>L. <span t-field="o.costo"/></td>
+                            <td>L. <span t-field="o.valor_total"/></td>
+                            <td><span t-field="o.proveedor_id.name"/></td>
+                            <td><span t-field="o.fecha"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tp-total">
+                    <p>Registros: <t t-esc="len(docs)"/> | Valorizado total: L. <t t-esc="'%0.2f' % total"/></p>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_taller_licencia_list" model="ir.ui.view">
+        <field name="name">taller.licencia.certificado.list</field>
+        <field name="model">taller.licencia.certificado</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="orden_id"/>
+                <field name="partner_id"/>
+                <field name="tipo_licencia_id"/>
+                <field name="fecha_emision"/>
+                <field name="vigente_hasta"/>
+                <field name="tecnico_id"/>
+                <field name="state" widget="badge" decoration-warning="state == 'borrador'" decoration-success="state == 'emitido'" decoration-danger="state == 'anulado'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_taller_licencia_form" model="ir.ui.view">
+        <field name="name">taller.licencia.certificado.form</field>
+        <field name="model">taller.licencia.certificado</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_emitir" string="Emitir" type="object" class="oe_highlight" invisible="state != 'borrador'"/>
+                    <button name="action_anular" string="Anular" type="object" confirm="¿Anular este certificado?" invisible="state == 'anulado'"/>
+                    <button name="print_certificado" string="Imprimir certificado" type="object" invisible="not id or state == 'anulado'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="borrador,emitido,anulado"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Certificado">
+                            <field name="name"/>
+                            <field name="orden_id"/>
+                            <field name="partner_id"/>
+                            <field name="equipo_info"/>
+                        </group>
+                        <group string="Licencia">
+                            <field name="tipo_licencia_id"/>
+                            <field name="clave"/>
+                            <field name="duracion"/>
+                            <field name="tecnico_id"/>
+                        </group>
+                    </group>
+                    <group string="Vigencia">
+                        <field name="fecha_emision"/>
+                        <field name="vigente_desde"/>
+                        <field name="vigente_hasta"/>
+                    </group>
+                    <group string="Notas">
+                        <field name="observaciones"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_taller_licencia_search" model="ir.ui.view">
+        <field name="name">taller.licencia.certificado.search</field>
+        <field name="model">taller.licencia.certificado</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="orden_id"/>
+                <field name="partner_id"/>
+                <field name="tipo_licencia_id"/>
+                <filter name="borrador" string="Borradores" domain="[('state','=','borrador')]"/>
+                <filter name="emitido" string="Emitidos" domain="[('state','=','emitido')]"/>
+                <filter name="anulado" string="Anulados" domain="[('state','=','anulado')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="tipo" string="Tipo licencia" context="{'group_by':'tipo_licencia_id'}"/>
+                    <filter name="tecnico" string="Técnico" context="{'group_by':'tecnico_id'}"/>
+                    <filter name="mes" string="Mes emisión" context="{'group_by':'fecha_emision:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_taller_licencia" model="ir.actions.act_window">
+        <field name="name">Certificados de licencia</field>
+        <field name="res_model">taller.licencia.certificado</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Certificado imprimible con firmas -->
+    <record id="action_report_taller_licencia" model="ir.actions.report">
+        <field name="name">Certificado de licencia</field>
+        <field name="model">taller.licencia.certificado</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">taller_sact.report_taller_licencia</field>
+        <field name="report_file">taller_sact.report_taller_licencia</field>
+        <field name="paperformat_id" ref="paperformat_taller_letter"/>
+        <field name="print_report_name">'Certificado %s' % object.name</field>
+    </record>
+
+    <template id="report_taller_licencia">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="taller-print">
+                    <style>
+                        @page { size: Letter; margin: 10mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .taller-print { font-family: 'Segoe UI', Arial, sans-serif; color: #313131; max-width: 215.9mm; margin: 0 auto; padding: 10px; background: #fff; font-size: 12px; }
+                        .taller-print .tp-hdr { display: table; width: 100%; border-bottom: 4px solid #00144a; padding-bottom: 10px; margin-bottom: 12px; }
+                        .taller-print .tp-hdr-left { display: table-cell; vertical-align: top; }
+                        .taller-print .tp-hdr-left p { margin: 5px 0; font-size: 12px; }
+                        .taller-print .tp-ws { background: rgba(37,211,102,.12); padding: 4px 8px; border-left: 3px solid #25D366; margin: 5px 0; font-weight: bold; display: inline-block; font-size: 12px; }
+                        .taller-print .tp-hdr-right { display: table-cell; vertical-align: top; text-align: right; }
+                        .taller-print .tp-ordcode { font-size: 14px; font-weight: bold; background: #ffeb3b; padding: 3px 6px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
+                        .taller-print .tp-fecha { font-size: 14px; color: #555; }
+                        .taller-print .tp-qr { margin-top: 10px; }
+                        .taller-print .tp-scan { font-size: 10px; margin-top: 2px; }
+                        .taller-print h2 { font-size: 20px; margin: 0 0 4px; color: #00144a; }
+                        .taller-print .tp-sec { background: #82cdff; color: #fff; padding: 6px 10px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+                        .taller-print table.tp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 10px; table-layout: fixed; }
+                        .taller-print table.tp-table td { overflow-wrap: break-word; word-break: break-word; }
+                        .taller-print img { max-width: 100%; }
+                        .taller-print table.tp-table th, .taller-print table.tp-table td { padding: 4px 6px; text-align: left; vertical-align: top; }
+                        .taller-print table.tp-table th { width: 30%; background: #f2f2f2; }
+                        .taller-print table.tp-table td { border-bottom: 1px solid #ddd; }
+                        .taller-print .tp-key { font-family: monospace; font-size: 15px; font-weight: bold; background: #ffeb3b; padding: 4px 10px; border-radius: 4px; display: inline-block; }
+                        .taller-print .tp-sign { display: table; width: 100%; margin-top: 20px; }
+                        .taller-print .tp-sign div { display: table-cell; text-align: center; font-size: 13px; }
+                        .taller-print .tp-badge { display: inline-block; font-weight: bold; font-size: 13px; color: #fff; background: #3498db; padding: 3px 14px; border-radius: 999px; }
+                        .taller-print .tp-nobreak { break-inside: avoid; page-break-inside: avoid; }
+                        .taller-print .tp-printbtn { text-align: right; margin-bottom: 10px; }
+                        .taller-print .tp-printbtn button { font-size: 14px; padding: 8px 22px; background: #00144a; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                        .taller-print .tp-terms { margin-top: 8px; font-size: 10px; line-height: 1.2; }
+                        .taller-print .tp-terms h3 { color: #00144a; margin-bottom: 4px; font-size: 13px; }
+                        @media print {
+                            .taller-print .tp-printbtn { display: none !important; }
+                            .taller-print { max-width: none; width: 100%; padding: 0; }
+                            .taller-print * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                            .taller-print .tp-sec { background-color: #82cdff !important; color: #fff !important; }
+                            .taller-print .tp-hdr { border-bottom: 4px solid #00144a !important; }
+                            .taller-print .tp-ordcode { background: #ffeb3b !important; }
+                            .taller-print .tp-ws { background: rgba(37,211,102,.12) !important; border-left: 3px solid #25D366 !important; }
+                        }
+                    </style>
+                    <div class="tp-printbtn"><button onclick="window.print()">Imprimir</button></div>
+                    <div class="tp-hdr tp-nobreak">
+                        <div class="tp-hdr-left">
+                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="width:100px"/>
+                            <img t-if="not o.company_id.logo" src="/taller_sact/static/img/logo.png" style="width:100px"/>
+                            <p>Dirección: esquina opuesta a edificio MAKELO, Barrio El Centro, Tocoa, Colón.</p>
+                            <p class="tp-ws">Soporte Técnico: 3359-8370</p>
+                        </div>
+                        <div class="tp-hdr-right">
+                            <div class="tp-ordcode">Licencia: <span t-field="o.name"/></div>
+                            <div class="tp-fecha">Fecha: <span t-field="o.fecha_emision"/></div>
+                            <div class="tp-qr"><img src="/taller_sact/static/img/whatsapp-qr.JPG" alt="WhatsApp QR" style="width:100px"/><div class="tp-scan">Escanea para contactar</div></div>
+                        </div>
+                    </div>
+                    <h2>Certificado <span t-field="o.name"/> <span class="tp-badge" t-esc="dict(o._fields['state'].selection).get(o.state)"/></h2>
+                    <div class="tp-sec">Información del Cliente</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Cliente</th><td><span t-field="o.partner_id.name"/></td></tr>
+                        <tr><th>Orden N°</th><td><span t-field="o.orden_id.name"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Información del Equipo</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Equipo</th><td><span t-field="o.equipo_info"/></td></tr>
+                        <tr><th>Número de serie</th><td><span t-field="o.orden_id.numero_serie"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Información de la Licencia</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Tipo de licencia</th><td><span t-field="o.tipo_licencia_id.name"/></td></tr>
+                        <tr><th>Descripción</th><td><span t-field="o.tipo_licencia_id.descripcion"/></td></tr>
+                        <tr><th>Duración</th><td><span t-field="o.duracion"/></td></tr>
+                        <tr><th>Vigencia</th><td><span t-field="o.vigente_desde"/> al <span t-field="o.vigente_hasta"/></td></tr>
+                        <tr><th>Clave de activación</th><td><span class="tp-key" t-field="o.clave"/></td></tr>
+                        <tr><th>Técnico</th><td><span t-field="o.tecnico_id.name"/></td></tr>
+                    </table>
+                    <div class="tp-terms">
+                        <h3>Términos y Condiciones</h3>
+                        <ol>
+                            <li>Esta licencia es intransferible y está vinculada exclusivamente al equipo especificado en este certificado.</li>
+                            <li>La manipulación o intento de modificación de la clave de activación invalidará automáticamente la licencia.</li>
+                            <li>No se permiten reembolsos una vez activada la licencia.</li>
+                            <li>El cliente es responsable del respaldo de la clave de activación y documentación relacionada.</li>
+                            <li>La empresa no se hace responsable por pérdidas de acceso debido a modificaciones en el hardware del equipo.</li>
+                            <li>El soporte técnico relacionado con la activación está limitado al período inicial de instalación.</li>
+                            <li>El uso del software está sujeto a los términos y condiciones del fabricante.</li>
+                            <li>La garantía de la licencia no cubre daños por mal uso, virus o modificaciones no autorizadas del sistema.</li>
+                        </ol>
+                        <p><i>Al firmar este documento, el cliente acepta todos los términos y condiciones aquí establecidos.</i></p>
+                    </div>
+                    <div class="tp-sign tp-nobreak">
+                        <div>_________________________<br/>Firma del Cliente</div>
+                        <div>_________________________<br/>Técnico: <span t-field="o.tecnico_id.name"/></div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_taller_campo_list" model="ir.ui.view">
+        <field name="name">taller.campo.list</field>
+        <field name="model">taller.campo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="tecnico_ids" widget="many2many_tags"/>
+                <field name="fecha"/>
+                <field name="monto_cobrado" sum="Total cobrado"/>
+                <field name="gasto_comida" sum="Total comida"/>
+                <field name="gasto_combustible" sum="Total combustible"/>
+                <field name="gasto_materiales" sum="Total materiales"/>
+                <field name="gasto_operativo" sum="Total gasto operativo"/>
+                <field name="neto" sum="Total neto"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_taller_campo_form" model="ir.ui.view">
+        <field name="name">taller.campo.form</field>
+        <field name="model">taller.campo</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group string="Trabajo de campo">
+                            <field name="name" placeholder="Código de cotización o factura"/>
+                            <field name="fecha"/>
+                            <field name="tecnico_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Montos">
+                            <field name="monto_cobrado"/>
+                            <field name="gasto_comida"/>
+                            <field name="gasto_combustible"/>
+                            <field name="gasto_materiales"/>
+                            <field name="gasto_operativo" readonly="1"/>
+                            <field name="neto" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_taller_campo_search" model="ir.ui.view">
+        <field name="name">taller.campo.search</field>
+        <field name="model">taller.campo</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="tecnico_ids"/>
+                <filter name="hoy" string="Hoy" domain="[('fecha','=',context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="mes" string="Este mes" domain="[('fecha','>=', (context_today().replace(day=1)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="tecnico" string="Técnico" context="{'group_by':'tecnico_ids'}"/>
+                    <filter name="mes" string="Mes" context="{'group_by':'fecha:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_taller_campo" model="ir.actions.act_window">
+        <field name="name">Trabajos de campo</field>
+        <field name="res_model">taller.campo</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Wizard reporte filtrado -->
+    <record id="view_taller_reporte_campo_wizard_form" model="ir.ui.view">
+        <field name="name">taller.reporte.campo.wizard.form</field>
+        <field name="model">taller.reporte.campo.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="fecha_desde"/>
+                    <field name="fecha_hasta"/>
+                    <field name="tecnico_id"/>
+                </group>
+                <footer>
+                    <button name="action_ver_lista" string="Ver lista filtrada" type="object" class="oe_highlight"/>
+                    <button name="action_imprimir" string="Imprimir" type="object" class="btn-secondary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_taller_reporte_campo_wizard" model="ir.actions.act_window">
+        <field name="name">Reporte de trabajos de campo</field>
+        <field name="res_model">taller.reporte.campo.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Reporte imprimible (individual) -->
+    <record id="action_report_taller_campo" model="ir.actions.report">
+        <field name="name">Reporte de trabajo de campo</field>
+        <field name="model">taller.campo</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">taller_sact.reporte_campo</field>
+        <field name="report_file">taller_sact.reporte_campo</field>
+        <field name="paperformat_id" ref="paperformat_taller_letter"/>
+    </record>
+
+    <template id="reporte_campo">
+        <t t-call="web.html_container">
+            <div class="taller-print">
+                <style>
+                    @page { size: Letter; margin: 10mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    .taller-print { font-family: 'Segoe UI', Arial, sans-serif; color: #313131; max-width: 215.9mm; margin: 0 auto; padding: 10px; background: #fff; font-size: 12px; }
+                    .taller-print .tp-head { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+                    .taller-print .tp-company { font-size: 22px; font-weight: bold; color: #2980b9; }
+                    .taller-print .tp-title { font-size: 18px; margin: 10px 0; color: #3498db; }
+                    .taller-print .tp-period { font-size: 14px; margin-bottom: 10px; color: #34495e; }
+                    .taller-print table.tp-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+                    .taller-print table.tp-table th { background: #3498db; color: #fff; padding: 8px; text-align: left; }
+                    .taller-print table.tp-table td { padding: 6px; border-bottom: 1px solid #ddd; overflow-wrap: break-word; word-break: break-word; }
+                    .taller-print .tp-total { margin-top: 16px; text-align: right; font-size: 14px; font-weight: bold; }
+                    .taller-print .tp-total span { background: #f39c12; color: #fff; padding: 3px 8px; border-radius: 4px; }
+                    .taller-print .tp-printbtn { text-align: right; margin-bottom: 10px; }
+                    .taller-print .tp-printbtn button { font-size: 14px; padding: 8px 22px; background: #00144a; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                    @media print {
+                        .taller-print .tp-printbtn { display: none !important; }
+                        .taller-print { max-width: none; width: 100%; padding: 0; }
+                        .taller-print * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .taller-print table.tp-table th { background: #3498db !important; color: #fff !important; }
+                        .taller-print .tp-total span { background: #f39c12 !important; color: #fff !important; }
+                    }
+                </style>
+                <div class="tp-printbtn"><button onclick="window.print()">Imprimir</button></div>
+                <div class="tp-head">
+                    <div class="tp-company">Tecno's Comp</div>
+                    <div>Tecnología y Servicios Computacionales</div>
+                    <div class="tp-title">REPORTE DE TRABAJOS DE CAMPO</div>
+                    <div class="tp-period">Período: <t t-esc="etiqueta"/></div>
+                </div>
+                <table class="tp-table">
+                    <thead>
+                        <tr>
+                            <th>Referencia</th><th>Usuario</th><th>Fecha</th><th>Monto Cobrado</th>
+                            <th>Comida</th><th>Combustible</th><th>Materiales</th><th>Gasto Operativo</th><th>Neto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="docs" t-as="d">
+                            <td><span t-field="d.name"/></td>
+                            <td><span t-field="d.tecnico_ids"/></td>
+                            <td><span t-field="d.fecha"/></td>
+                            <td>L. <span t-field="d.monto_cobrado"/></td>
+                            <td>L. <span t-field="d.gasto_comida"/></td>
+                            <td>L. <span t-field="d.gasto_combustible"/></td>
+                            <td>L. <span t-field="d.gasto_materiales"/></td>
+                            <td>L. <span t-field="d.gasto_operativo"/></td>
+                            <td>L. <span t-field="d.neto"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tp-total">
+                    <p>Total de Registros: <t t-esc="total_registros"/></p>
+                    <p>Monto Cobrado Total: <span>L. <t t-esc="'%0.2f' % total_cobrado"/></span></p>
+                    <p>Gasto Operativo Total: <span>L. <t t-esc="'%0.2f' % total_gasto"/></span></p>
+                    <p>Neto Total: <span>L. <t t-esc="'%0.2f' % total_neto"/></span></p>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

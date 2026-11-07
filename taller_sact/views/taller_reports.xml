@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_taller_letter" model="report.paperformat">
+        <field name="name">Taller Letter</field>
+        <field name="format">Letter</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- BOLETA DE INGRESO / ORDEN DE TRABAJO -->
+    <record id="action_report_taller_orden" model="ir.actions.report">
+        <field name="name">Orden de trabajo</field>
+        <field name="model">taller.orden</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">taller_sact.report_taller_orden</field>
+        <field name="report_file">taller_sact.report_taller_orden</field>
+        <field name="paperformat_id" ref="paperformat_taller_letter"/>
+        <field name="print_report_name">'Orden %s' % object.name</field>
+    </record>
+
+    <template id="report_taller_orden">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="taller-print">
+                    <style>
+                        @page { size: Letter; margin: 10mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .taller-print { font-family: 'Segoe UI', Arial, sans-serif; color: #313131; max-width: 215.9mm; margin: 0 auto; padding: 10px; background: #fff; font-size: 12px; }
+                        .taller-print .tp-hdr { display: table; width: 100%; border-bottom: 4px solid #00144a; padding-bottom: 10px; margin-bottom: 12px; }
+                        .taller-print .tp-hdr-left { display: table-cell; vertical-align: top; }
+                        .taller-print .tp-hdr-left p { margin: 5px 0; font-size: 12px; }
+                        .taller-print .tp-ws { background: rgba(37,211,102,.12); padding: 4px 8px; border-left: 3px solid #25D366; margin: 5px 0; font-weight: bold; display: inline-block; font-size: 12px; }
+                        .taller-print .tp-hdr-right { display: table-cell; vertical-align: top; text-align: right; }
+                        .taller-print .tp-ordcode { font-size: 14px; font-weight: bold; background: #ffeb3b; padding: 3px 6px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
+                        .taller-print .tp-fecha { font-size: 14px; color: #555; }
+                        .taller-print .tp-qr { margin-top: 10px; }
+                        .taller-print .tp-scan { font-size: 10px; margin-top: 2px; }
+                        .taller-print h2 { font-size: 20px; margin: 0 0 4px; color: #00144a; }
+                        .taller-print .tp-sec { background: #82cdff; color: #fff; padding: 6px 10px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+                        .taller-print table.tp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 10px; table-layout: fixed; }
+                        .taller-print table.tp-table td { overflow-wrap: break-word; word-break: break-word; }
+                        .taller-print img { max-width: 100%; }
+                        .taller-print table.tp-table th, .taller-print table.tp-table td { padding: 4px 6px; text-align: left; vertical-align: top; }
+                        .taller-print table.tp-table th { width: 30%; background: #f2f2f2; }
+                        .taller-print table.tp-table td { border-bottom: 1px solid #ddd; }
+                        .taller-print .tp-meta { font-size: 12px; color: #555; }
+                        .taller-print .tp-barcode { text-align: center; margin: 10px 0; }
+                        .taller-print .tp-terms { margin-top: 8px; font-size: 10px; line-height: 1.2; }
+                        .taller-print .tp-terms h3 { color: #00144a; margin-bottom: 4px; font-size: 13px; }
+                        .taller-print .tp-sign { display: table; width: 100%; margin-top: 20px; }
+                        .taller-print .tp-sign div { display: table-cell; text-align: center; font-size: 13px; }
+                        .taller-print .tp-badge { display: inline-block; font-weight: bold; font-size: 13px; color: #fff; background: #3498db; padding: 3px 14px; border-radius: 999px; }
+                        .taller-print .tp-nobreak { break-inside: avoid; page-break-inside: avoid; }
+                        .taller-print .tp-printbtn { text-align: right; margin-bottom: 10px; }
+                        .taller-print .tp-printbtn button { font-size: 14px; padding: 8px 22px; background: #00144a; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                        @media print {
+                            .taller-print .tp-printbtn { display: none !important; }
+                            .taller-print { max-width: none; width: 100%; padding: 0; }
+                            .taller-print * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                            .taller-print .tp-sec { background-color: #82cdff !important; color: #fff !important; }
+                            .taller-print .tp-hdr { border-bottom: 4px solid #00144a !important; }
+                            .taller-print .tp-ordcode { background: #ffeb3b !important; }
+                            .taller-print .tp-key { background: #ffeb3b !important; }
+                            .taller-print .tp-ws { background: rgba(37,211,102,.12) !important; border-left: 3px solid #25D366 !important; }
+                        }
+                    </style>
+                    <div class="tp-printbtn"><button onclick="window.print()">Imprimir</button></div>
+                    <div class="tp-hdr tp-nobreak">
+                        <div class="tp-hdr-left">
+                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="width:100px"/>
+                            <p>Dirección: esquina opuesta a edificio MAKELO, Barrio El Centro, Tocoa, Colón.</p>
+                            <p class="tp-ws">Soporte Técnico: 3359-8370</p>
+                        </div>
+                        <div class="tp-hdr-right">
+                            <div class="tp-ordcode">Orden: <span t-field="o.name"/></div>
+                            <div class="tp-fecha">Fecha Ingreso: <span t-field="o.fecha_ingreso"/></div>
+                            <!-- sin QR -->
+                            <div class="tp-qr"><img src="/taller_sact/static/img/whatsapp-qr.JPG" alt="WhatsApp QR" style="width:100px"/><div class="tp-scan">Escanea para contactar</div></div>
+                        </div>
+                    </div>
+                    <h2>Orden <span t-field="o.name"/> <span class="tp-badge" t-esc="dict(o._fields['state'].selection).get(o.state)"/></h2>
+                    <div class="tp-sec">Datos de Cliente</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Nombre</th><td><span t-field="o.partner_id.name"/></td></tr>
+                        <tr><th>Teléfono</th><td><span t-field="o.partner_id.phone"/></td></tr>
+                        <tr><th>Técnico asignado</th><td><span t-field="o.tecnico_id.name"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Información del Equipo</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Tipo de equipo</th><td><span t-field="o.tipo_equipo_id"/></td></tr>
+                        <tr><th>Marca</th><td><span t-field="o.marca_id"/></td></tr>
+                        <tr><th>Modelo</th><td><span t-field="o.modelo"/></td></tr>
+                        <tr><th>Número de serie</th><td><span t-field="o.numero_serie"/></td></tr>
+                        <tr><th>Accesorios</th><td><span t-field="o.accesorios"/></td></tr>
+                        <tr><th>Cargador</th><td><span t-field="o.cargador"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Diagnóstico y Trabajo</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Defecto previo</th><td><span t-field="o.defecto_previo"/></td></tr>
+                        <tr><th>Daño / Problema</th><td><span t-field="o.descripcion_problema"/></td></tr>
+                        <tr><th>Tipo de trabajo</th><td><span t-field="o.tipo_trabajo_id"/></td></tr>
+                        <tr><th>Descripción del trabajo</th><td><span t-field="o.descripcion_trabajo"/></td></tr>
+                    </table>
+                    <div class="tp-terms">
+                        <h3>Términos y Condiciones</h3>
+                        <ol>
+                            <li>Presentar este documento al momento de retirar su equipo del área de soporte técnico.</li>
+                            <li>Almacene su factura durante el tiempo de garantía estimado sobre su reparación.</li>
+                            <li>No nos hacemos responsables por la pérdida de datos en equipos dañados o infectados.</li>
+                            <li>Al momento de retirar su equipo solo se entregarán accesorios registrados en esta orden.</li>
+                            <li>No nos hacemos responsables por equipos olvidados por más de un mes después de la notificación.</li>
+                            <li>Equipos en garantía ingresan con un tiempo de espera mínimo de 15 días, estipulados por el proveedor.</li>
+                            <li>No nos hacemos responsables por equipos que presenten fallas y se dañen durante el proceso de reparación.</li>
+                        </ol>
+                    </div>
+                    <div class="tp-sign tp-nobreak">
+                        <div>_________________________<br/>Firma del Cliente</div>
+                        <div>_________________________<br/>Técnico: <span t-field="o.tecnico_id.name"/></div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- REPORTE DE PRE-ALTA / DIAGNÓSTICO -->
+    <record id="action_report_taller_prealta" model="ir.actions.report">
+        <field name="name">Pre-alta / Diagnóstico</field>
+        <field name="model">taller.orden</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">taller_sact.report_taller_prealta</field>
+        <field name="report_file">taller_sact.report_taller_prealta</field>
+        <field name="paperformat_id" ref="paperformat_taller_letter"/>
+        <field name="print_report_name">'Pre-Alta %s' % object.codigo_prealta</field>
+    </record>
+
+    <template id="report_taller_prealta">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="taller-print">
+                    <style>
+                        @page { size: Letter; margin: 10mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .taller-print { font-family: 'Segoe UI', Arial, sans-serif; color: #313131; max-width: 215.9mm; margin: 0 auto; padding: 10px; background: #fff; font-size: 12px; }
+                        .taller-print .tp-hdr { display: table; width: 100%; border-bottom: 4px solid #00144a; padding-bottom: 10px; margin-bottom: 12px; }
+                        .taller-print .tp-hdr-left { display: table-cell; vertical-align: top; }
+                        .taller-print .tp-hdr-left p { margin: 5px 0; font-size: 12px; }
+                        .taller-print .tp-ws { background: rgba(37,211,102,.12); padding: 4px 8px; border-left: 3px solid #25D366; margin: 5px 0; font-weight: bold; display: inline-block; font-size: 12px; }
+                        .taller-print .tp-hdr-right { display: table-cell; vertical-align: top; text-align: right; }
+                        .taller-print .tp-ordcode { font-size: 14px; font-weight: bold; background: #ffeb3b; padding: 3px 6px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
+                        .taller-print .tp-fecha { font-size: 14px; color: #555; }
+                        .taller-print .tp-qr { margin-top: 10px; }
+                        .taller-print .tp-scan { font-size: 10px; margin-top: 2px; }
+                        .taller-print h2 { font-size: 20px; margin: 0 0 4px; color: #00144a; }
+                        .taller-print .tp-sec { background: #82cdff; color: #fff; padding: 6px 10px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+                        .taller-print table.tp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 10px; table-layout: fixed; }
+                        .taller-print table.tp-table td { overflow-wrap: break-word; word-break: break-word; }
+                        .taller-print img { max-width: 100%; }
+                        .taller-print table.tp-table th, .taller-print table.tp-table td { padding: 4px 6px; text-align: left; vertical-align: top; }
+                        .taller-print table.tp-table th { width: 30%; background: #f2f2f2; }
+                        .taller-print table.tp-table td { border-bottom: 1px solid #ddd; }
+                        .taller-print .tp-meta { font-size: 12px; color: #555; }
+                        .taller-print .tp-code { font-size: 20px; font-weight: bold; letter-spacing: 5px; }
+                        .taller-print .tp-box { border: 1px solid #000; min-height: 65px; }
+                        .taller-print .tp-barcode { text-align: center; margin: 10px 0; }
+                        .taller-print .tp-nobreak { break-inside: avoid; page-break-inside: avoid; }
+                        .taller-print .tp-printbtn { text-align: right; margin-bottom: 10px; }
+                        .taller-print .tp-printbtn button { font-size: 14px; padding: 8px 22px; background: #00144a; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                        @media print {
+                            .taller-print .tp-printbtn { display: none !important; }
+                            .taller-print { max-width: none; width: 100%; padding: 0; }
+                            .taller-print * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                            .taller-print .tp-sec { background-color: #82cdff !important; color: #fff !important; }
+                            .taller-print .tp-hdr { border-bottom: 4px solid #00144a !important; }
+                            .taller-print .tp-ordcode { background: #ffeb3b !important; }
+                            .taller-print .tp-key { background: #ffeb3b !important; }
+                            .taller-print .tp-ws { background: rgba(37,211,102,.12) !important; border-left: 3px solid #25D366 !important; }
+                        }
+                    </style>
+                    <div class="tp-printbtn"><button onclick="window.print()">Imprimir</button></div>
+                    <div class="tp-hdr tp-nobreak">
+                        <div class="tp-hdr-left">
+                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="width:100px"/>
+                            <p>Dirección: esquina opuesta a edificio MAKELO, Barrio El Centro, Tocoa, Colón.</p>
+                            <p class="tp-ws">Soporte Técnico: 3359-8370</p>
+                        </div>
+                        <div class="tp-hdr-right">
+                            <div class="tp-ordcode">Pre-Alta: <span t-field="o.codigo_prealta"/></div>
+                            <div class="tp-fecha">Orden: <span t-field="o.name"/> | Fecha Ingreso: <span t-field="o.fecha_ingreso"/></div>
+                            <!-- sin QR -->
+                            <div class="tp-qr"><img src="/taller_sact/static/img/whatsapp-qr.JPG" alt="WhatsApp QR" style="width:100px"/><div class="tp-scan">Escanea para contactar</div></div>
+                        </div>
+                    </div>
+                    <h2>Pre-Alta: <span t-field="o.codigo_prealta"/></h2>
+                    <div class="tp-sec">Información</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Cliente</th><td><span t-field="o.partner_id.name"/></td></tr>
+                        <tr><th>Equipo</th><td><span t-field="o.tipo_equipo_id"/> <span t-field="o.marca_id"/> <span t-field="o.modelo"/></td></tr>
+                        <tr><th>Técnico</th><td><span t-field="o.tecnico_prealta_id.name"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Diagnóstico del Equipo</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Defecto previo</th><td><span t-field="o.defecto_previo"/></td></tr>
+                        <tr><th>Daño / Problema</th><td><span t-field="o.descripcion_problema"/></td></tr>
+                        <tr><th>Accesorios</th><td><span t-field="o.accesorios"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Detalles</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Solución</th><td><span t-field="o.solucion_previa"/></td></tr>
+                        <tr><th>Precio estimado</th><td><span t-field="o.precio_estimado"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Nota Adicional (costos extra o aclaraciones)</div>
+                    <div class="tp-box"/>
+                    <div class="tp-barcode tp-nobreak">
+                        <img t-att-src="'/report/barcode/Code128/%s?width=380&amp;height=55' % o.codigo_prealta" style="height:50px; max-width:100%;"/>
+                        <div class="tp-code"><span t-field="o.codigo_prealta"/></div>
+                        <p>Escanee este código para generar el alta final</p>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- ALTA DE SERVICIO / ENTREGA -->
+    <record id="action_report_taller_alta" model="ir.actions.report">
+        <field name="name">Alta de servicio / Entrega</field>
+        <field name="model">taller.orden</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">taller_sact.report_taller_alta</field>
+        <field name="report_file">taller_sact.report_taller_alta</field>
+        <field name="paperformat_id" ref="paperformat_taller_letter"/>
+        <field name="print_report_name">'Alta %s' % object.name</field>
+    </record>
+
+    <template id="report_taller_alta">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="taller-print">
+                    <style>
+                        @page { size: Letter; margin: 10mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .taller-print { font-family: 'Segoe UI', Arial, sans-serif; color: #313131; max-width: 215.9mm; margin: 0 auto; padding: 10px; background: #fff; font-size: 12px; }
+                        .taller-print .tp-hdr { display: table; width: 100%; border-bottom: 4px solid #00144a; padding-bottom: 10px; margin-bottom: 12px; }
+                        .taller-print .tp-hdr-left { display: table-cell; vertical-align: top; }
+                        .taller-print .tp-hdr-left p { margin: 5px 0; font-size: 12px; }
+                        .taller-print .tp-ws { background: rgba(37,211,102,.12); padding: 4px 8px; border-left: 3px solid #25D366; margin: 5px 0; font-weight: bold; display: inline-block; font-size: 12px; }
+                        .taller-print .tp-hdr-right { display: table-cell; vertical-align: top; text-align: right; }
+                        .taller-print .tp-ordcode { font-size: 14px; font-weight: bold; background: #ffeb3b; padding: 3px 6px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
+                        .taller-print .tp-fecha { font-size: 14px; color: #555; }
+                        .taller-print .tp-qr { margin-top: 10px; }
+                        .taller-print .tp-scan { font-size: 10px; margin-top: 2px; }
+                        .taller-print h2 { font-size: 20px; margin: 0 0 4px; color: #00144a; }
+                        .taller-print .tp-sec { background: #82cdff; color: #fff; padding: 6px 10px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+                        .taller-print table.tp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 10px; table-layout: fixed; }
+                        .taller-print table.tp-table td { overflow-wrap: break-word; word-break: break-word; }
+                        .taller-print img { max-width: 100%; }
+                        .taller-print table.tp-table th, .taller-print table.tp-table td { padding: 4px 6px; text-align: left; vertical-align: top; }
+                        .taller-print table.tp-table th { width: 30%; background: #f2f2f2; }
+                        .taller-print table.tp-table td { border-bottom: 1px solid #ddd; }
+                        .taller-print .tp-meta { font-size: 12px; color: #555; }
+                        .taller-print .tp-key { font-size: 15px; font-weight: bold; background: #ffeb3b; padding: 4px 10px; border-radius: 4px; display: inline-block; }
+                        .taller-print .tp-terms { margin-top: 8px; font-size: 12px; line-height: 1.4; }
+                        .taller-print .tp-sign { display: table; width: 100%; margin-top: 20px; }
+                        .taller-print .tp-sign div { display: table-cell; text-align: center; font-size: 13px; }
+                        .taller-print .tp-nobreak { break-inside: avoid; page-break-inside: avoid; }
+                        .taller-print .tp-printbtn { text-align: right; margin-bottom: 10px; }
+                        .taller-print .tp-printbtn button { font-size: 14px; padding: 8px 22px; background: #00144a; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                        @media print {
+                            .taller-print .tp-printbtn { display: none !important; }
+                            .taller-print { max-width: none; width: 100%; padding: 0; }
+                            .taller-print * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                            .taller-print .tp-sec { background-color: #82cdff !important; color: #fff !important; }
+                            .taller-print .tp-hdr { border-bottom: 4px solid #00144a !important; }
+                            .taller-print .tp-ordcode { background: #ffeb3b !important; }
+                            .taller-print .tp-key { background: #ffeb3b !important; }
+                            .taller-print .tp-ws { background: rgba(37,211,102,.12) !important; border-left: 3px solid #25D366 !important; }
+                        }
+                    </style>
+                    <div class="tp-printbtn"><button onclick="window.print()">Imprimir</button></div>
+                    <div class="tp-hdr tp-nobreak">
+                        <div class="tp-hdr-left">
+                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="width:100px"/>
+                            <p>Dirección: esquina opuesta a edificio MAKELO, Barrio El Centro, Tocoa, Colón.</p>
+                            <p class="tp-ws">Soporte Técnico: 3359-8370</p>
+                        </div>
+                        <div class="tp-hdr-right">
+                            <div class="tp-ordcode">Orden: <span t-field="o.name"/></div>
+                            <div class="tp-fecha">Fecha Salida: <span t-field="o.fecha_salida"/></div>
+                            <!-- sin QR -->
+                            <div class="tp-qr"><img src="/taller_sact/static/img/whatsapp-qr.JPG" alt="WhatsApp QR" style="width:100px"/><div class="tp-scan">Escanea para contactar</div></div>
+                        </div>
+                    </div>
+                    <h2>Alta de Servicio - Orden <span t-field="o.name"/></h2>
+                    <p class="tp-meta">Entregado a: <span t-field="o.reclama"/></p>
+                    <div class="tp-sec">Cliente y Equipo</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Cliente</th><td><span t-field="o.partner_id.name"/> (<span t-field="o.partner_id.phone"/>)</td></tr>
+                        <tr><th>Equipo</th><td><span t-field="o.tipo_equipo_id"/> <span t-field="o.marca_id"/> <span t-field="o.modelo"/> - Serie: <span t-field="o.numero_serie"/></td></tr>
+                        <tr><th>Técnico que realizó el trabajo</th><td><span t-field="o.tecnico_alta_id.name"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Servicio Realizado</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Solución aplicada</th><td><span t-field="o.solucion"/></td></tr>
+                        <tr><th>Calidad del servicio</th><td><span t-field="o.calidad"/></td></tr>
+                        <tr><th>Garantía</th><td><span t-field="o.garantia"/></td></tr>
+                        <tr><th>Productos utilizados</th><td><span t-field="o.productos_usados"/></td></tr>
+                        <tr><th>Costo de reparación</th><td>L. <span class="tp-key" t-field="o.precio"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Términos y Condiciones</div>
+                    <ol class="tp-terms tp-nobreak">
+                        <li>Presentar este documento al momento de retirar su equipo del área de soporte técnico.</li>
+                        <li>Almacene su factura durante el tiempo de garantía estimado sobre su reparación.</li>
+                        <li>No tomamos responsabilidad por pérdida de datos en sistemas dañados en su totalidad o dispositivos defectuosos.</li>
+                        <li>Al momento de dejar su equipo solo solicitamos el equipo.</li>
+                        <li>No tomamos responsabilidad por equipos olvidados por más de un mes después de la notificación de reparación.</li>
+                        <li>No tomamos responsabilidad por tintas y suministros de uso necesario para revisión de impresoras.</li>
+                        <li>Reparaciones electrónicas tienen un límite máximo de 15 días de garantía cuales el técnico especificará.</li>
+                        <li>Equipos en garantía ingresan con un tiempo de espera mínimo de 15 días, estipulados por centro de soporte o proveedor.</li>
+                        <li>No tomamos responsabilidad por equipos que presenten fallas y se dañen durante el proceso de reparación o revisión.</li>
+                        <li>Este documento no es una factura, es un reporte de reparación y la factura generada a partir del mismo puede tener un valor total distinto.</li>
+                    </ol>
+                    <div class="tp-sign tp-nobreak">
+                        <div>_________________________<br/>Firma del Cliente (recibido conforme)</div>
+                        <div>_________________________<br/>Técnico: <span t-field="o.tecnico_alta_id.name"/></div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- HOJA DE PEDIDO -->
+    <record id="action_report_taller_pedido" model="ir.actions.report">
+        <field name="name">Hoja de pedido</field>
+        <field name="model">taller.pedido</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">taller_sact.report_taller_pedido</field>
+        <field name="report_file">taller_sact.report_taller_pedido</field>
+        <field name="paperformat_id" ref="paperformat_taller_letter"/>
+        <field name="print_report_name">'Pedido %s' % object.name</field>
+    </record>
+
+    <template id="report_taller_pedido">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="taller-print">
+                    <style>
+                        @page { size: Letter; margin: 10mm; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .taller-print { font-family: 'Segoe UI', Arial, sans-serif; color: #313131; max-width: 215.9mm; margin: 0 auto; padding: 10px; background: #fff; font-size: 12px; }
+                        .taller-print .tp-hdr { display: table; width: 100%; border-bottom: 4px solid #00144a; padding-bottom: 10px; margin-bottom: 12px; }
+                        .taller-print .tp-hdr-left { display: table-cell; vertical-align: top; }
+                        .taller-print .tp-hdr-left p { margin: 5px 0; font-size: 12px; }
+                        .taller-print .tp-ws { background: rgba(37,211,102,.12); padding: 4px 8px; border-left: 3px solid #25D366; margin: 5px 0; font-weight: bold; display: inline-block; font-size: 12px; }
+                        .taller-print .tp-hdr-right { display: table-cell; vertical-align: top; text-align: right; }
+                        .taller-print .tp-ordcode { font-size: 14px; font-weight: bold; background: #ffeb3b; padding: 3px 6px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
+                        .taller-print .tp-fecha { font-size: 14px; color: #555; }
+                        .taller-print h2 { font-size: 20px; margin: 0 0 4px; color: #00144a; }
+                        .taller-print .tp-sec { background: #82cdff; color: #fff; padding: 6px 10px; margin-top: 20px; font-size: 16px; font-weight: bold; }
+                        .taller-print table.tp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 10px; table-layout: fixed; }
+                        .taller-print table.tp-table td { overflow-wrap: break-word; word-break: break-word; }
+                        .taller-print img { max-width: 100%; }
+                        .taller-print table.tp-table th, .taller-print table.tp-table td { padding: 4px 6px; text-align: left; vertical-align: top; }
+                        .taller-print table.tp-table th { width: 30%; background: #f2f2f2; }
+                        .taller-print table.tp-table td { border-bottom: 1px solid #ddd; }
+                        .taller-print .tp-terms { margin-top: 8px; font-size: 10px; line-height: 1.2; }
+                        .taller-print .tp-sign { display: table; width: 100%; margin-top: 20px; }
+                        .taller-print .tp-sign div { display: table-cell; text-align: center; font-size: 13px; }
+                        .taller-print .tp-badge { display: inline-block; font-weight: bold; font-size: 13px; color: #fff; background: #3498db; padding: 3px 14px; border-radius: 999px; }
+                        .taller-print .tp-nobreak { break-inside: avoid; page-break-inside: avoid; }
+                        .taller-print .tp-printbtn { text-align: right; margin-bottom: 10px; }
+                        .taller-print .tp-printbtn button { font-size: 14px; padding: 8px 22px; background: #00144a; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                        @media print {
+                            .taller-print .tp-printbtn { display: none !important; }
+                            .taller-print { max-width: none; width: 100%; padding: 0; }
+                            .taller-print * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                            .taller-print .tp-sec { background-color: #82cdff !important; color: #fff !important; }
+                            .taller-print .tp-hdr { border-bottom: 4px solid #00144a !important; }
+                            .taller-print .tp-ordcode { background: #ffeb3b !important; }
+                            .taller-print .tp-key { background: #ffeb3b !important; }
+                            .taller-print .tp-ws { background: rgba(37,211,102,.12) !important; border-left: 3px solid #25D366 !important; }
+                        }
+                    </style>
+                    <div class="tp-printbtn"><button onclick="window.print()">Imprimir</button></div>
+                    <div class="tp-hdr tp-nobreak">
+                        <div class="tp-hdr-left">
+                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="width:100px"/>
+                            <p>Dirección: esquina opuesta a edificio MAKELO, Barrio El Centro, Tocoa, Colón.</p>
+                            <p class="tp-ws">Soporte Técnico: 3359-8370</p>
+                        </div>
+                        <div class="tp-hdr-right">
+                            <div class="tp-ordcode">Pedido: <span t-field="o.name"/></div>
+                            <div class="tp-fecha">Fecha: <span t-field="o.fecha"/></div>
+                            <div class="tp-qr"><img src="/taller_sact/static/img/whatsapp-qr.JPG" alt="WhatsApp QR" style="width:100px"/><div class="tp-scan">Escanea para contactar</div></div>
+                        </div>
+                    </div>
+                    <h2>Pedido <span t-field="o.name"/> <span class="tp-badge" t-esc="dict(o._fields['state'].selection).get(o.state)"/></h2>
+                    <div class="tp-sec">Información del Cliente</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Cliente</th><td><span t-field="o.partner_id.name"/></td></tr>
+                        <tr><th>Teléfono</th><td><span t-field="o.partner_id.phone"/></td></tr>
+                        <tr><th>Identidad</th><td><span t-field="o.partner_id.vat"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Detalles del Producto</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Pieza</th><td><span t-field="o.tipo_pieza"/></td></tr>
+                        <tr><th>Marca</th><td><span t-field="o.marca_equipo"/></td></tr>
+                        <tr><th>Modelo</th><td><span t-field="o.modelo_equipo"/></td></tr>
+                        <tr><th>Serie</th><td><span t-field="o.serie"/></td></tr>
+                        <tr><th>N° Parte</th><td><span t-field="o.numero_parte"/></td></tr>
+                    </table>
+                    <div class="tp-sec">Información de Pago</div>
+                    <table class="tp-table tp-nobreak">
+                        <tr><th>Precio Total</th><td>L. <span t-field="o.precio_pieza"/></td></tr>
+                        <tr><th>Abono</th><td>L. <span t-field="o.abono"/></td></tr>
+                        <tr><th>Saldo</th><td><strong>L. <span t-field="o.saldo"/></strong></td></tr>
+                    </table>
+                    <div class="tp-sec">Términos y Condiciones</div>
+                    <ol class="tp-terms tp-nobreak">
+                        <li>El tiempo de entrega está sujeto a la disponibilidad del producto.</li>
+                        <li>La garantía aplica únicamente por defectos de fábrica.</li>
+                        <li>Es necesario presentar este documento para retirar el pedido.</li>
+                        <li>Los pedidos no reclamados después de 30 días serán cancelados.</li>
+                    </ol>
+                    <div class="tp-sign tp-nobreak">
+                        <div>_________________________<br/>Cliente</div>
+                        <div>_________________________<br/>Autorizado</div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

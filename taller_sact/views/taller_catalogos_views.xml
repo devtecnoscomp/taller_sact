@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_taller_tipo_equipo_list" model="ir.ui.view">
+        <field name="name">taller.tipo.equipo.list</field>
+        <field name="model">taller.tipo.equipo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_taller_tipo_equipo_form" model="ir.ui.view">
+        <field name="name">taller.tipo.equipo.form</field>
+        <field name="model">taller.tipo.equipo</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet><group>
+                    <field name="name"/>
+                    <field name="active"/>
+                    <field name="sact_id" readonly="1"/>
+                    <field name="marca_ids" readonly="1"/>
+                </group></sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_taller_tipo_equipo" model="ir.actions.act_window">
+        <field name="name">Tipos de equipo</field>
+        <field name="res_model">taller.tipo.equipo</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_taller_marca_list" model="ir.ui.view">
+        <field name="name">taller.marca.list</field>
+        <field name="model">taller.marca</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="tipo_equipo_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_taller_marca_form" model="ir.ui.view">
+        <field name="name">taller.marca.form</field>
+        <field name="model">taller.marca</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet><group>
+                    <field name="name"/>
+                    <field name="tipo_equipo_id"/>
+                    <field name="active"/>
+                    <field name="sact_id" readonly="1"/>
+                </group></sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_taller_marca" model="ir.actions.act_window">
+        <field name="name">Marcas</field>
+        <field name="res_model">taller.marca</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_taller_tipo_trabajo_list" model="ir.ui.view">
+        <field name="name">taller.tipo.trabajo.list</field>
+        <field name="model">taller.tipo.trabajo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_taller_tipo_trabajo_form" model="ir.ui.view">
+        <field name="name">taller.tipo.trabajo.form</field>
+        <field name="model">taller.tipo.trabajo</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet><group>
+                    <field name="name"/>
+                    <field name="active"/>
+                    <field name="sact_id" readonly="1"/>
+                </group></sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_taller_tipo_trabajo" model="ir.actions.act_window">
+        <field name="name">Tipos de trabajo</field>
+        <field name="res_model">taller.tipo.trabajo</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_taller_tipo_licencia_list" model="ir.ui.view">
+        <field name="name">taller.tipo.licencia.list</field>
+        <field name="model">taller.tipo.licencia</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_taller_tipo_licencia_form" model="ir.ui.view">
+        <field name="name">taller.tipo.licencia.form</field>
+        <field name="model">taller.tipo.licencia</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet><group>
+                    <field name="name"/>
+                    <field name="descripcion"/>
+                    <field name="active"/>
+                    <field name="sact_id" readonly="1"/>
+                </group></sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_taller_tipo_licencia" model="ir.actions.act_window">
+        <field name="name">Tipos de licencia</field>
+        <field name="res_model">taller.tipo.licencia</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
