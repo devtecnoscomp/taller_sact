@@ -1,7 +1,7 @@
-SACT - Gestión de taller
-========================
+SACT - Workshop Management
+==========================
 
-Módulo para Odoo 18 que gestiona el flujo completo de un taller de reparación:
-recepción, diagnóstico, reparación, pre-alta, alta y baja.
+Odoo 18 module that manages the complete repair workshop flow:
+reception, diagnosis, repair, pre-delivery, delivery and write-off.
 
-Dependencias: base, mail, sale, stock.
+Dependencies: base, mail, sale, stock.
