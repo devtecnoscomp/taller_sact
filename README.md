@@ -1,4 +1,4 @@
-# SACT — Gestión de Taller de Servicio Técnico de Computación
+# SACT — Sistema de Administración y Control de Taller
 
 Módulo personalizado para **Odoo** que gestiona de forma integral el flujo de un **taller de servicio técnico de computación** (recepción, diagnóstico, reparación y entrega de equipos). Reemplaza el flujo estándar de reparación de Odoo con un ciclo de vida propio adaptado a las operaciones del taller.
 
