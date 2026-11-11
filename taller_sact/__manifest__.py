@@ -8,7 +8,7 @@ Replicates the flow: WAITING -> IN REPAIR (note) -> READY (pre-delivery) -> DELI
 Includes equipment, customer, technician, accessories, photos (chatter/attachments),
 updates/timeline, warranties, prices and portal tracking token.
     """,
-    "author": "SACT",
+    "author": "Tecnos Comp Tocoa",
     "category": "Services/Repair",
     "depends": ["base", "mail", "sale", "stock"],
     "data": [
