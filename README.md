@@ -86,4 +86,4 @@ LGPL-3
 
 ## Autor
 
-SACT — https://github.com/devtecnoscomp/taller_sact
+Tecnos Comp Tocoa — https://github.com/devtecnoscomp/taller_sact
