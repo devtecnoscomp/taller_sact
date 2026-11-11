@@ -8,7 +8,7 @@ Replica el flujo: ESPERA -> EN REPARACION (nota) -> LISTO (pre-alta) -> ENTREGAD
 Incluye equipo, cliente, técnico, accesorios, fotos (chatter/adjuntos),
 actualizaciones/timeline, garantías, precios y token de seguimiento portal.
     """,
-    "author": "SACT",
+    "author": "Tecnos Comp Tocoa",
     "website": "https://github.com/devtecnoscomp/taller_sact",
     "category": "Services/Repair",
     "depends": ["base", "mail", "sale", "stock"],
