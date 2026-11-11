@@ -30,6 +30,6 @@ updates/timeline, warranties, prices and portal tracking token.
     "demo": [],
     "installable": True,
     "application": True,
-    "images": ["static/img/logo.png"],
+    "images": ["static/img/logo.png", "static/description/screen1.png"],
     "license": "LGPL-3",
 }
